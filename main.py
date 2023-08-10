@@ -119,12 +119,8 @@ from torchvision import datasets
 
 if __name__ == '__main__':
     th = TrainingHandler(
-        "dataset/training", ["frontal_faces", "non_faces"], 12, 24,
+        "dataset/training", ["non_faces"], 12, 24,
         r'dataset/training/extracted_dataset\extracted_dataset.pkl'
     )
 
-    data, labels, index = th.getDataset()
-
-    learner = BaseLearnerSoftMax()
-
-    learner.fit(data.iloc[:, 33].values, labels, ones(labels.size) / 0.5, epochs=5, verbose=2)
+    th.start(pathToModelDir="models", parallelize=True, adaBoost=True, verbose=2)

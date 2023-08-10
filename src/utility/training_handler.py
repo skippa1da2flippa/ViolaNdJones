@@ -92,8 +92,8 @@ class TrainingHandler:
         self._dataset = shuffledDataset
         self._labels = shuffledLabelSet
 
-        featExtr = FeatureExtractor(self._windowSize)
-        extractedFeats, index = featExtr.extractAll(self._dataset)
+        featExtractor = FeatureExtractor(self._windowSize)
+        extractedFeats, index = featExtractor.extractAll(self._dataset)
         DataHandler.storeData((extractedFeats, self._labels, index), self._pathToDataset)
         return extractedFeats, index
 
@@ -125,12 +125,14 @@ class TrainingHandler:
         weakLearners: ndarray[WeakLearner] = array([])
 
         for era in range(0, self._nEras):
-            processes: ndarray[Process] = Parallelize.parallelizeOneWithMany(
-                startAction, array([(
+            args: ndarray[tuple[Any, ...]] = array([(
                     1, dataFrame, self._labels, self._index,
                     self._windowSize, os.path.join(pathToDirectory, f"wl_{idx}.pkl"),
                     verbose, self._weakLearnerEpochs
                 ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats.iloc[:5000, :]))], dtype=object)
+
+            processes: ndarray[Process] = Parallelize.parallelizeOneWithMany(
+                startAction, args
             )
 
             Parallelize.waitProcesses(processes, endAction, (
