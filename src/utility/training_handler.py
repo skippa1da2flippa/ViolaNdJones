@@ -15,14 +15,14 @@ from src.utility.parallelization_handler import Parallelize
 
 
 def startAction(nEras: int, dataset: DataFrame, labelSet: ndarray[int], index: dict[str, int],
-                imgSize: int, path: str, verbose: int = 0, weakLearnerEpochs: int = 10):
+                weights: ndarray[float], imgSize: int, path: str, verbose: int = 0, weakLearnerEpochs: int = 10):
     adaBoostManager: AdaBoost = AdaBoost(
         nEras, dataset, labelSet, index, imgSize, weakLearnerEpochs
     )
 
     start: Callable[[ndarray[float]], StrongLearner] = adaBoostManager.startGenerator(verbose)
 
-    newModel: WeakLearner = start(adaBoostManager.getWeights()).getWeakLearners()[0]
+    newModel: WeakLearner = start(weights).getWeakLearners()[0]
     ModelHandler.storeModel(newModel, path)
 
 
@@ -124,23 +124,23 @@ class TrainingHandler:
         weights: ndarray[float] = AdaBoost.initializeWeights(self._labels)
         weakLearners: ndarray[WeakLearner] = array([])
 
-        for era in range(0, self._nEras):
-            args: ndarray[tuple[Any, ...]] = array([(
-                    1, dataFrame, self._labels, self._index,
-                    self._windowSize, os.path.join(pathToDirectory, f"wl_{idx}.pkl"),
-                    verbose, self._weakLearnerEpochs
-                ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats.iloc[:5000, :]))], dtype=object)
+        args: ndarray[tuple[Any, ...]] = array([(
+            1, dataFrame, self._labels, self._index, weights,
+            self._windowSize, os.path.join(pathToDirectory, f"wl_{idx}.pkl"),
+            verbose, self._weakLearnerEpochs
+        ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats.iloc[:5000, :]))], dtype=object)
 
+        for era in range(0, self._nEras):
             processes: ndarray[Process] = Parallelize.parallelizeOneWithMany(
                 startAction, args
             )
 
             Parallelize.waitProcesses(processes, endAction, (
-                [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(Parallelize.getMaxProcessesNumber())],
+                [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(args.size)],
                 os.path.join(pathToDirectory, f"epoch:{era}.pkl")
             ))
 
-            tempWeakLearner: WeakLearner = ModelHandler.getModel(os.path.join(pathToDirectory, f"epoch:{era}" + ".pkl"))
+            tempWeakLearner: WeakLearner = ModelHandler.getModel(os.path.join(pathToDirectory, f"epoch:{era}.pkl"))
             weakLearners = append(weakLearners, [tempWeakLearner])
 
             # update weights
