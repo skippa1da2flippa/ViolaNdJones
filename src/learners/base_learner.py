@@ -28,7 +28,7 @@ class BaseLearnerSoftMax(nn.Module):
         return self._softMax(weightedInput)
 
     def fit(self, xTrain: ndarray[float], yTrain: ndarray[int],
-            weights: ndarray[float], batchSize: int = 32, epochs: int = 10,
+            weights: ndarray[float], batchSize: int = 32, epochs: int = 5,
             verbose: int = 0
             ) -> tuple[list[dict[str, Tensor]], float]:
 
