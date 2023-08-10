@@ -1,9 +1,8 @@
-from numpy import ndarray, array, append, float32
+from numpy import ndarray, array, append
 from pandas import DataFrame
 from skimage.feature import haar_like_feature
 from skimage.transform import integral_image
 
-from src.utility.data_handler import DataLink
 
 haarFeaturesType: tuple[str, str, str, str, str] = (
     "type-2-x", "type-2-y", "type-3-x", "type-3-y", "type-4"

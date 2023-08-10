@@ -34,7 +34,7 @@ class SlidingWindow:
                 if window.shape[0] == self._windowSize and window.shape[1] == self._windowSize:
                     yield x, y, window, pyramidHeight
 
-    # TODO the rectangles get shown but they are not drawn on the real photo
+    # TODO the rectangles get shown, but they are not drawn on the real photo
     # TODO test this scale factor (done because the rectangles is drawn on th real image not a rescale)
     def drawRectangle(self, img: ndarray, coord: tuple[float, float], scaleFactor: float):
         stepLength: float = scaleFactor * self._scale if scaleFactor else 1

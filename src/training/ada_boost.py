@@ -1,8 +1,7 @@
 from typing import Callable
 from numpy import ndarray, array, append, ones
 from pandas import DataFrame
-
-from src.haar_features.features_extractor import assignRightFeature, FeatureExtractor
+from src.haar_features.features_extractor import assignRightFeature
 from src.learners.strong_learner import StrongLearner
 from src.learners.weak_learner import WeakLearner
 
