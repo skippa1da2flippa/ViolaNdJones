@@ -1,5 +1,5 @@
 import torch.nn as nn
-from torch import Tensor
+from torch import Tensor, inner
 from torch import linalg as euclidean
 
 
@@ -12,7 +12,8 @@ class WeightedEuclideanDistance(nn.Module):
                 ids: Tensor, save: bool = False) -> Tensor:
 
         distanceTensor: Tensor = yTrue - yPred
-        weightedDistance: Tensor = weights * euclidean.norm(distanceTensor)
+        euclideanDistance: Tensor = euclidean.norm(distanceTensor, dim=1)
+        weightedDistance: Tensor = inner(weights, euclideanDistance)
         if save:
             self._errorMap.append({
                 "yPred": yPred,

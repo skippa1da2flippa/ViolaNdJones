@@ -91,7 +91,7 @@ from torchvision import datasets
 
     learner = BaseLearnerSoftMax()
 
-    start = time() g
+    start = time()
 
     learner.fit(data.iloc[:, 33].values, labels, ones(labels.size) / 0.5, epochs=1, verbose=2)
 
@@ -106,13 +106,25 @@ from torchvision import datasets
         r'dataset/training/extracted_dataset\extracted_dataset.pkl'
     )
 
-    th.start(pathToModelDir="models", parallelize=True, adaBoost=True, verbose=2)
+    th.start(pathToModelDir="models", parallelize=False, adaBoost=True, verbose=2)
+"""
+
+"""
+    torch1 = tensor([[2.4, 5.4], [45.8, 66.4]])
+    torch2 = torch.linalg.norm(torch1, dim=1)
+    print(torch2)
+    print(torch.linalg.norm(tensor([2.4, 5.4])))
+    print(torch.linalg.norm(tensor([45.8, 66.4])))
 """
 
 if __name__ == '__main__':
     th = TrainingHandler(
-        "dataset/training", ["non_faces"], 12, 24,
+        "dataset/training", ["frontal_faces", "non_faces"], 12, 24,
         r'dataset/training/extracted_dataset\extracted_dataset.pkl'
     )
 
-    th.start(pathToModelDir="models", parallelize=True, adaBoost=True, verbose=2)
+    data, labels, index = th.getDataset()
+
+    learner = BaseLearnerSoftMax()
+
+    learner.fit(data.iloc[:, 33].values, labels, ones(labels.size) / 0.5, epochs=5, verbose=2)

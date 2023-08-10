@@ -28,7 +28,7 @@ class BaseLearnerSoftMax(nn.Module):
         return self._softMax(weightedInput)
 
     def fit(self, xTrain: ndarray[float], yTrain: ndarray[int],
-            weights: ndarray[float], batchSize: int = 1, epochs: int = 10,
+            weights: ndarray[float], batchSize: int = 32, epochs: int = 10,
             verbose: int = 0
             ) -> tuple[list[dict[str, Tensor]], float]:
 
@@ -83,8 +83,8 @@ class BaseLearnerSoftMax(nn.Module):
     def predictAll(self, samples: Tensor) -> Tensor:
         res: Tensor = tensor([], dtype=int32)
         for sample in samples:
-            pred: Tensor = self.predict(sample)
-            res = tensorAppend(res, pred)
+            prediction: Tensor = self.predict(sample)
+            res = tensorAppend(res, prediction)
 
         return res
 

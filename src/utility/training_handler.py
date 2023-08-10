@@ -97,7 +97,7 @@ class TrainingHandler:
         DataHandler.storeData((extractedFeats, self._labels, index), self._pathToDataset)
         return extractedFeats, index
 
-    def start(self, pathToModelDir: str, parallelize: bool = True, adaBoost: bool = True, verbose: int = 0) \
+    def start(self, pathToModelDir: str, parallelize: bool = False, adaBoost: bool = True, verbose: int = 0) \
             -> Union[StrongLearner, Any]:
 
         if adaBoost:
@@ -111,7 +111,7 @@ class TrainingHandler:
                     self._weakLearnerEpochs
                 )
 
-                strongLearner = adaboostManager.start()
+                strongLearner = adaboostManager.start(verbose)
 
             ModelHandler.storeModel(strongLearner, join(pathToModelDir, "finalClassifier.pkl"))
 
@@ -130,7 +130,7 @@ class TrainingHandler:
                     1, dataFrame, self._labels, self._index,
                     self._windowSize, os.path.join(pathToDirectory, f"wl_{idx}.pkl"),
                     verbose, self._weakLearnerEpochs
-                ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats))], dtype=object)
+                ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats.iloc[:5000, :]))], dtype=object)
             )
 
             Parallelize.waitProcesses(processes, endAction, (
