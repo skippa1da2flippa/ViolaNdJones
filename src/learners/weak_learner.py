@@ -22,7 +22,7 @@ class WeakLearner(object):
         self._weightsMap: ndarray[bool] = full(self._dataset.size, False, dtype=np.bool)
         self._fit(epochs=epochs, verbose=verbose)
 
-    def _fit(self, epochs: int = 10, verbose: int = 0):
+    def _fit(self, epochs: int = 5, verbose: int = 0):
         trainingResult = self._weakLearner.fit(
             self._dataset, self._labels, self._weights,
             verbose=verbose, epochs=epochs

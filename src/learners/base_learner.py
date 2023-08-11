@@ -44,7 +44,6 @@ class BaseLearnerSoftMax(nn.Module):
         for epoch in range(epochs):
             trueLoss = 0.0
             for batch in batches:
-
                 if verbose > 2:
                     print(f"\033[37mWeights: {self._weightsApplier.weight}\033[0m")
 

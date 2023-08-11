@@ -11,16 +11,17 @@ class WeightedEuclideanDistance(nn.Module):
     def forward(self, yTrue: Tensor, yPred: Tensor, weights: Tensor,
                 ids: Tensor, save: bool = False) -> Tensor:
 
-        distanceTensor: Tensor = yTrue - yPred
-        euclideanDistance: Tensor = euclidean.norm(distanceTensor, dim=1)
-        weightedDistance: Tensor = inner(weights, euclideanDistance)
+        distancesTensor: Tensor = yTrue - yPred
+        euclideanDistances: Tensor = euclidean.norm(distancesTensor, dim=1)
+        weightedDistances: Tensor = inner(weights, euclideanDistances)
+
         if save:
             self._errorMap.append({
                 "yPred": yPred,
                 "ids": ids
             })
 
-        return weightedDistance
+        return weightedDistances
 
     def getErrorMap(self) -> list[dict[str, Tensor]]:
         return self._errorMap
