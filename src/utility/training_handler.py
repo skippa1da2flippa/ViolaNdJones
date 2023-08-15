@@ -120,7 +120,9 @@ class TrainingHandler:
         else:
             pass  # TODO in case we would like to perform attentional cascade
 
-    def _multiProcessAdaBoost(self, pathToDirectory: str, oldWeights: ndarray[float] = None, verbose: int = 0) -> StrongLearner:
+    def _multiProcessAdaBoost(self, pathToDirectory: str, oldWeights: ndarray[float] = None, verbose: int = 0) \
+            -> StrongLearner:
+
         weights: ndarray[float] = AdaBoost.initializeWeights(self._labels[:5000]) if oldWeights is None else oldWeights
         weakLearners: ndarray[WeakLearner] = array([])
 
