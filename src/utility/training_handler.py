@@ -20,7 +20,7 @@ def startAction(nEras: int, dataset: DataFrame, labelSet: ndarray[int], index: d
         nEras, dataset, labelSet, index, imgSize, weakLearnerEpochs
     )
 
-    start: Callable[[ndarray[float]], StrongLearner] = adaBoostManager.startGenerator(verbose)
+    start: Callable[[ndarray[float]], StrongLearner] = adaBoostManager.startGenerator(False, verbose)
 
     newModel: WeakLearner = start(weights).getWeakLearners()[0]
     ModelHandler.storeModel(newModel, path)
@@ -47,7 +47,7 @@ def splitDataframe(data: DataFrame, split: int) -> Generator[ndarray[DataFrame],
 
 
 def prepareRightSplit(data: DataFrame) -> Generator[ndarray[DataFrame], None, None]:
-    nProcesses: int = Parallelize.getMaxProcessesNumber() // 2
+    nProcesses: int = Parallelize.getMaxProcessesNumber() - 2
     nSplits: int = data.shape[1] // nProcesses
     return splitDataframe(data, nSplits)
 
@@ -97,13 +97,13 @@ class TrainingHandler:
         DataHandler.storeData((extractedFeats, self._labels, index), self._pathToDataset)
         return extractedFeats, index
 
-    def start(self, pathToModelDir: str, parallelize: bool = False, adaBoost: bool = True, verbose: int = 0) \
-            -> Union[StrongLearner, Any]:
+    def start(self, pathToModelDir: str, parallelize: bool = False, adaBoost: bool = True,
+              oldWeights: ndarray[float] = None, verbose: int = 0) -> Union[StrongLearner, Any]:
 
         if adaBoost:
             strongLearner: StrongLearner
             if parallelize:
-                strongLearner = self._multiProcessAdaBoost(pathToModelDir, verbose)
+                strongLearner = self._multiProcessAdaBoost(pathToModelDir, oldWeights, verbose)
 
             else:
                 adaboostManager: AdaBoost = AdaBoost(
@@ -120,12 +120,12 @@ class TrainingHandler:
         else:
             pass  # TODO in case we would like to perform attentional cascade
 
-    def _multiProcessAdaBoost(self, pathToDirectory: str, verbose: int = 0) -> StrongLearner:
-        weights: ndarray[float] = AdaBoost.initializeWeights(self._labels)
+    def _multiProcessAdaBoost(self, pathToDirectory: str, oldWeights: ndarray[float] = None, verbose: int = 0) -> StrongLearner:
+        weights: ndarray[float] = AdaBoost.initializeWeights(self._labels[:5000]) if oldWeights is None else oldWeights
         weakLearners: ndarray[WeakLearner] = array([])
 
         args: ndarray[tuple[Any, ...]] = array([(
-            1, dataFrame, self._labels, self._index, weights,
+            1, dataFrame, self._labels[:5000], self._index, weights,
             self._windowSize, os.path.join(pathToDirectory, f"wl_{idx}.pkl"),
             verbose, self._weakLearnerEpochs
         ) for idx, dataFrame in enumerate(prepareRightSplit(self._extractedFeats.iloc[:5000, :]))], dtype=object)
@@ -136,10 +136,12 @@ class TrainingHandler:
             )
 
             Parallelize.waitProcesses(processes, endAction, (
-                [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(args.size)],
-                os.path.join(pathToDirectory, f"epoch:{era}.pkl")
-            ))
+                    [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(args.size)],
+                    os.path.join(pathToDirectory, f"epoch_{era}.pkl")
+                )
+            )
 
+            # get best weak learner from the t-th era
             tempWeakLearner: WeakLearner = ModelHandler.getModel(os.path.join(pathToDirectory, f"epoch:{era}.pkl"))
             weakLearners = append(weakLearners, [tempWeakLearner])
 

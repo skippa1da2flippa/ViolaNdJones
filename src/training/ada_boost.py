@@ -58,7 +58,7 @@ class AdaBoost:
     def updateWeights(weights: ndarray[float], weakLearnerBeta: float, weakLearnerWeightsMap: ndarray[bool]):
         weights[weakLearnerWeightsMap] *= weakLearnerBeta
 
-    def startGenerator(self, verbose: int = 0) -> Callable[[ndarray[float]], StrongLearner]:
+    def startGenerator(self, updateWeights: bool = True, verbose: int = 0) -> Callable[[ndarray[float]], StrongLearner]:
         def detachedStart(weights: ndarray[float]) -> StrongLearner:
             for era in range(self._nEras):
                 # normalize the weights
@@ -66,7 +66,9 @@ class AdaBoost:
 
                 # find the weak learner with the lowest loss
                 bestWeakLearner: WeakLearner = self._getBestWeakLearner(verbose)
-                AdaBoost.updateWeights(weights, bestWeakLearner.getBeta(), bestWeakLearner.getWeightsMap())
+
+                if updateWeights:
+                    AdaBoost.updateWeights(weights, bestWeakLearner.getBeta(), bestWeakLearner.getWeightsMap())
 
                 # store the best weak learner at the t-th era
                 self._weakLearners = append(self._weakLearners, [bestWeakLearner])
@@ -79,7 +81,7 @@ class AdaBoost:
         return detachedStart
 
     def start(self, verbose: int = 0) -> StrongLearner:
-        start: Callable[[ndarray[float]], StrongLearner] = self.startGenerator(verbose)
+        start: Callable[[ndarray[float]], StrongLearner] = self.startGenerator(True, verbose)
         return start(self._weights)
 
     def _getBestWeakLearner(self, verbose: int = 0) -> WeakLearner:

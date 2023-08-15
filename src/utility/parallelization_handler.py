@@ -22,11 +22,11 @@ class Parallelize(object):
         return runningProcesses
 
     @staticmethod
-    def waitProcesses(processes: ndarray[Process], action: Callable, *args: tuple[Any, ...]):
+    def waitProcesses(processes: ndarray[Process], action: Callable, args: tuple[Any, ...]):
         for idx in range(processes.size):
             processes[idx].join()
 
-        action(args)
+        action(*args)
 
     @staticmethod
     def getMaxProcessesNumber() -> int:

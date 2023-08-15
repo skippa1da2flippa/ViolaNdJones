@@ -15,6 +15,8 @@ from src.image_processing.preprocessing import ImagesManager
 from src.learners.base_learner import BaseLearnerSoftMax
 from src.learners.weak_learner import WeakLearner
 from src.training.ada_boost import AdaBoost
+from src.utility.model_utility.model_handler import ModelHandler
+from src.utility.parallelization_handler import Parallelize
 from src.utility.training_handler import TrainingHandler
 import tensorflow as tf
 from torchvision import datasets
@@ -102,11 +104,11 @@ from torchvision import datasets
 
 """
     th = TrainingHandler(
-        "dataset/training", ["non_faces"], 12, 24,
+        "dataset/training", ["non_faces"], 2, 24,
         r'dataset/training/extracted_dataset\extracted_dataset.pkl'
     )
 
-    th.start(pathToModelDir="models", parallelize=False, adaBoost=True, verbose=2)
+    th.start(pathToModelDir="models", parallelize=True, adaBoost=True, verbose=2)
 """
 
 """
@@ -118,9 +120,18 @@ from torchvision import datasets
 """
 
 if __name__ == '__main__':
+    weak: WeakLearner = ModelHandler.getModel(os.path.join("models", "epoch_zero.pkl"))
+    weak.getErrorRate()
+
     th = TrainingHandler(
-        "dataset/training", ["non_faces"], 12, 24,
+        "dataset/training", ["non_faces"], 2, 24,
         r'dataset/training/extracted_dataset\extracted_dataset.pkl'
     )
 
-    th.start(pathToModelDir="models", parallelize=True, adaBoost=True, verbose=2)
+    AdaBoost.updateWeights(weak.getWeights()[:5000], weak.getBeta(), weak.getWeightsMap())
+
+    th.start(
+        pathToModelDir="models", parallelize=True, adaBoost=True,
+        oldWeights=weak.getWeights()[:5000],
+        verbose=2
+    )

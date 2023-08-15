@@ -9,7 +9,7 @@ class WeakLearner(object):
             self, dataset: ndarray[float], labelSet: ndarray[int], weights: ndarray[float],
             ftType: str, ftIndex: int, epochs: int = 10, verbose: int = 0
     ):
-        self._weakLearner: BaseLearnerSoftMax = BaseLearnerSoftMax()
+        self._baseLearner: BaseLearnerSoftMax = BaseLearnerSoftMax()
         self._threshold: float
         self._errorRate: float
         self._beta: float
@@ -23,7 +23,7 @@ class WeakLearner(object):
         self._fit(epochs=epochs, verbose=verbose)
 
     def _fit(self, epochs: int = 5, verbose: int = 0):
-        trainingResult = self._weakLearner.fit(
+        trainingResult = self._baseLearner.fit(
             self._dataset, self._labels, self._weights,
             verbose=verbose, epochs=epochs
         )
@@ -42,16 +42,19 @@ class WeakLearner(object):
                 self._weightsMap[_id] = label == self._labels[_id]
 
     def predictAll(self, samples: ndarray[float]) -> ndarray[int]:
-        return self._weakLearner.predictAll(tensor(samples)).numpy()
+        return self._baseLearner.predictAll(tensor(samples)).numpy()
 
     def predictOne(self, sample: float) -> int:
-        return self._weakLearner.predict(tensor(sample)).item()
+        return self._baseLearner.predict(tensor(sample)).item()
 
     def getErrorRate(self) -> float:
         return self._errorRate
 
     def getBeta(self) -> float:
         return self._beta
+
+    def getWeights(self) -> ndarray[float]:
+        return self._weights
 
     def getWeightsMap(self) -> ndarray[bool]:
         return self._weightsMap
