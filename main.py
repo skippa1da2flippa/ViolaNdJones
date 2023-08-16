@@ -119,6 +119,34 @@ from torchvision import datasets
     print(torch.linalg.norm(tensor([45.8, 66.4])))
 """
 
+"""
+    weak: WeakLearner = ModelHandler.getModel(os.path.join("models", "epoch_zero.pkl"))
+    weak.getErrorRate()
+
+    th = TrainingHandler(
+        "dataset/training", ["non_faces"], 2, 24,
+        r'dataset/training/extracted_dataset\extracted_dataset.pkl'
+    )
+
+    AdaBoost.updateWeights(weak.getWeights()[:5000], weak.getBeta(), weak.getWeightsMap())
+
+    th.start(
+        pathToModelDir="models", parallelize=True, adaBoost=True,
+        oldWeights=weak.getWeights()[:5000],
+        verbose=2
+    )
+"""
+
+"""
+    weak: WeakLearner = ModelHandler.getModel(os.path.join("models", "wl_0.pkl"))
+    for idx in range(1, 11):
+        tempModel: WeakLearner = ModelHandler.getModel(os.path.join("models", f"wl_{idx}.pkl"))
+        if tempModel.getErrorRate() < weak.getErrorRate():
+            weak = tempModel
+
+    ModelHandler.storeModel(weak, os.path.join("models", "epoch_one.pkl"))
+"""
+
 if __name__ == '__main__':
     weak: WeakLearner = ModelHandler.getModel(os.path.join("models", "epoch_zero.pkl"))
     weak.getErrorRate()

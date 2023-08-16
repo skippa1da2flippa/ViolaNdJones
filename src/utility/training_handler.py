@@ -36,7 +36,7 @@ def endAction(candidatesPaths: list[str], outputPath: str):
     ModelHandler.storeModel(model, outputPath)
 
 
-def splitDataframe(data: DataFrame, split: int) -> Generator[ndarray[DataFrame], None, None]:
+def splitDataframe(data: DataFrame, split: int) -> Generator[DataFrame, None, None]:
     for idx in range(0, data.shape[1], split):
         if idx + split >= data.shape[1]:
             indexLst: list[int] = [idj for idj in range(idx, data.shape[1])]
@@ -46,7 +46,7 @@ def splitDataframe(data: DataFrame, split: int) -> Generator[ndarray[DataFrame],
         yield data[indexLst].copy()
 
 
-def prepareRightSplit(data: DataFrame) -> Generator[ndarray[DataFrame], None, None]:
+def prepareRightSplit(data: DataFrame) -> Generator[DataFrame, None, None]:
     nProcesses: int = Parallelize.getMaxProcessesNumber() - 2
     nSplits: int = data.shape[1] // nProcesses
     return splitDataframe(data, nSplits)
@@ -144,7 +144,7 @@ class TrainingHandler:
             )
 
             # get best weak learner from the t-th era
-            tempWeakLearner: WeakLearner = ModelHandler.getModel(os.path.join(pathToDirectory, f"epoch:{era}.pkl"))
+            tempWeakLearner: WeakLearner = ModelHandler.getModel(os.path.join(pathToDirectory, f"epoch_{era}.pkl"))
             weakLearners = append(weakLearners, [tempWeakLearner])
 
             # update weights
