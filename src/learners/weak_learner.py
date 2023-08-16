@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import ndarray, full
-from torch import tensor, Tensor
+from torch import tensor, Tensor, float32
 from src.learners.base_learner import BaseLearnerSoftMax
 
 
@@ -42,10 +42,10 @@ class WeakLearner(object):
                 self._weightsMap[_id] = label == self._labels[_id]
 
     def predictAll(self, samples: ndarray[float]) -> ndarray[int]:
-        return self._baseLearner.predictAll(tensor(samples)).numpy()
+        return self._baseLearner.predictAll(tensor(samples, dtype=float32)).numpy()
 
     def predictOne(self, sample: float) -> int:
-        return self._baseLearner.predict(tensor(sample)).item()
+        return self._baseLearner.predict(tensor(sample, dtype=float32)).item()
 
     def getErrorRate(self) -> float:
         return self._errorRate

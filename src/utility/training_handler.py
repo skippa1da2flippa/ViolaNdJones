@@ -138,7 +138,7 @@ class TrainingHandler:
             )
 
             Parallelize.waitProcesses(processes, endAction, (
-                    [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(args.size)],
+                    [os.path.join(pathToDirectory, f"wl_{idx}.pkl") for idx in range(0, args.size)],
                     os.path.join(pathToDirectory, f"epoch_{era}.pkl")
                 )
             )
