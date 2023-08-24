@@ -38,7 +38,6 @@ class SlidingWindow:
     # TODO test this scale factor (done because the rectangles is drawn on th real image not a rescale)
     def drawRectangle(self, img: ndarray, coord: tuple[float, float], scaleFactor: float):
         stepLength: float = scaleFactor * self._scale if scaleFactor else 1
-        print(scaleFactor)
 
         startCoord: tuple[float, float] = (
             int(coord[0] * stepLength),
@@ -50,6 +49,4 @@ class SlidingWindow:
         )
 
         color: tuple[int, int, int] = (0, 255, 0)  # red
-        copy = img.copy()
-        cv2.rectangle(copy, startCoord, endCoord, color=color, thickness=2)
-        cv2.imshow("Window", copy)
+        cv2.rectangle(img, startCoord, endCoord, color=color, thickness=2)

@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch as th
 from numpy import ndarray
 from torch.nn import Linear, Softmax
-from torch import Tensor, tensor, argmax, int32
+from torch import Tensor, tensor, argmax, int32, max
 from torch.optim import SGD
 from torch.utils.data import DataLoader, Dataset
 from src.utility.model_utility.dataset_wrapper import MultiModalDataset
@@ -77,7 +77,8 @@ class BaseLearnerSoftMax(nn.Module):
     def predict(self, sample: Tensor) -> Tensor:
         with th.no_grad():
             self.eval()  # Set the model to evaluation mode (if applicable)
-            return argmax(self(sample))
+            prediction: Tensor = self(sample)
+            return argmax(prediction)
 
     def predictAll(self, samples: Tensor) -> Tensor:
         res: Tensor = tensor([], dtype=int32)

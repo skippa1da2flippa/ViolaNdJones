@@ -1,4 +1,5 @@
-from numpy import ndarray, full, sum, array
+import cv2
+from numpy import ndarray, full, sum, array, int32, append
 from math import log2
 from src.haar_features.features_extractor import FeatureExtractor
 from src.image_processing.sliding_window import SlidingWindow
@@ -14,20 +15,22 @@ class StrongLearner(object):
         self._initializeAlphas()
 
     def _predictWindow(self, img: ndarray) -> bool:
-        weightedAccuracy: float = .0
-        for idx, weakLearner in enumerate(self._weakLearners):
+        weakLearnerPredictions: ndarray[int] = array([], dtype=int32)
+        for weakLearner in self._weakLearners:
             specificFeat: float = self._featureExtractor.extractOne(
                 img, weakLearner.getFeatType(), weakLearner.getFeatIndex()
             )
-            weightedAccuracy += self._alphas[idx] * weakLearner.predictOne(specificFeat)
+            weakLearnerPredictions = append(weakLearnerPredictions, weakLearner.predictOne(specificFeat))
 
-        return weightedAccuracy >= 0.5 * sum(self._alphas)
+        return self._alphas @ weakLearnerPredictions >= 0.5 * sum(self._alphas)
 
     def predictImage(self, img: ndarray):
         # TODO you are assuming someone already preprocess the image for you otherwise you need to do it here
         for x, y, window, scaleFactor in self._windowManager.getAllWindows(img):
             if self._predictWindow(window):
                 self._windowManager.drawRectangle(img, (x, y), scaleFactor)
+                cv2.imshow("Window2", img)
+                cv2.waitKey(0)
 
     def predictImages(self, images: ndarray):
         # TODO same thing here

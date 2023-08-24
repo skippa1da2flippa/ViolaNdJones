@@ -1,18 +1,22 @@
 import os
 from time import time
+
+import cv2
 import joblib
 import torch.nn as nn
 import numpy as np
 import torch
+from PIL import Image
 from numpy import ones, array, column_stack, concatenate
 from tensorflow import cast
-from torch import tensor
+from torch import tensor, float32, max
 from torch.nn import Linear
 from torchvision.transforms import ToTensor
 from torchvision import transforms
 from src.haar_features.features_extractor import FeatureExtractor
 from src.image_processing.preprocessing import ImagesManager
 from src.learners.base_learner import BaseLearnerSoftMax
+from src.learners.strong_learner import StrongLearner
 from src.learners.weak_learner import WeakLearner
 from src.training.ada_boost import AdaBoost
 from src.utility.model_utility.model_handler import ModelHandler
@@ -147,19 +151,30 @@ from torchvision import datasets
     ModelHandler.storeModel(weak, os.path.join("models", "epoch_one.pkl"))
 """
 
+"""
+    strong: StrongLearner = ModelHandler.getModel(os.path.join("models", "3_feats_strong.pkl"))
+    with Image.open(r"dataset/training/frontal_faces\_Mir_169508.jpg") as image:
+        strong.predictImage(array(image))
+"""
+
+"""
+    strong: StrongLearner = ModelHandler.getModel(os.path.join("models", "3_feats_strong.pkl"))
+
+    with Image.open(r"dataset/full_images\0_Parade_marchingband_1_5.jpg") as image:
+        image.thumbnail((500, 300))
+        strong.predictImage(array(image))
+"""
+
+# TODO big ass problem: the false positive rate is high as hell (like me) so 2 possible solutions:
+"""
+    a) train the weak classifiers with better data (add a lots of background image)
+    b) beware of the way I'm teaching the weak learners the possible error (_updateWeightsMap)
+"""
+
 if __name__ == '__main__':
-    weak: WeakLearner = ModelHandler.getModel(os.path.join("models", "epoch_zero.pkl"))
-    weak.getErrorRate()
+    strong: StrongLearner = ModelHandler.getModel(os.path.join("models", "3_feats_strong.pkl"))
 
-    th = TrainingHandler(
-        "dataset/training", ["non_faces"], 2, 24,
-        r'dataset/training/extracted_dataset\extracted_dataset.pkl'
-    )
+    with Image.open(r"dataset/full_images\0_Parade_marchingband_1_5.jpg") as image:
+        image.thumbnail((500, 300))
+        strong.predictImage(array(image))
 
-    AdaBoost.updateWeights(weak.getWeights()[:5000], weak.getBeta(), weak.getWeightsMap())
-
-    th.start(
-        pathToModelDir="models", parallelize=True, adaBoost=True,
-        oldWeights=weak.getWeights()[:5000],
-        verbose=2
-    )

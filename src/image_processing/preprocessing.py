@@ -6,9 +6,9 @@ class ImagesManager(BaseTransformer):
     def __init__(self, windowSize: int):
         super().__init__(windowSize)
 
-    def _squarifyOne(self, intputPath: str, outputPath: str):
+    def _squarifyOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["squarify"]
         )
 
@@ -18,9 +18,9 @@ class ImagesManager(BaseTransformer):
             actions=["squarify"]
         )
 
-    def resizeOne(self, intputPath: str, outputPath: str):
+    def resizeOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["resize"]
         )
 
@@ -30,50 +30,50 @@ class ImagesManager(BaseTransformer):
             actions=["resize"]
         )
 
-    def normalizeOne(self, intputPath: str, outputPath: str):
+    def normalizeOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["normalize"]
         )
 
-    def normalizeAll(self, intputPath: str, outputPath: str):
+    def normalizeAll(self, inputPath: str, outputPath: str):
         self._mapAll(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["normalize"]
         )
 
-    def toGreyScaleOne(self, intputPath: str, outputPath: str):
+    def toGreyScaleOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["to_grey"]
         )
 
-    def toGreyScaleAll(self, intputPath: str, outputPath: str):
+    def toGreyScaleAll(self, inputPath: str, outputPath: str):
         self._mapAll(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["to_grey"]
         )
 
-    def mirrorImageOne(self, intputPath: str, outputPath: str):
+    def mirrorImageOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["mirror"]
         )
 
-    def mirrorImageAll(self, intputPath: str, outputPath: str):
+    def mirrorImageAll(self, inputPath: str, outputPath: str):
         self._mapAll(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["mirror"]
         )
 
-    def preprocessOne(self, intputPath: str, outputPath: str):
+    def preprocessOne(self, inputPath: str, outputPath: str):
         self._mapOne(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["squarify", "resize", "to_grey", "normalize"]
         )
 
-    def preprocessAll(self, intputPath: str, outputPath: str):
+    def preprocessAll(self, inputPath: str, outputPath: str):
         self._mapAll(
-            intputPath, outputPath,
+            inputPath, outputPath,
             actions=["squarify", "resize", "to_grey", "normalize"]
         )
